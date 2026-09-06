@@ -37,7 +37,7 @@ README.md
 
 ## 🚀 Usage
 
-Download or clone the project and open `index.html` in your web browser.
+Visit our website in your web browser to see your ip.
 
 That's it! Your public IP address will be displayed automatically.
 
