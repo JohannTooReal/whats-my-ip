@@ -14,13 +14,14 @@ Simply open the website, and it will automatically check your public IP and disp
 
 ## 🛡️ Privacy
 
-This website does not ask you to enter personal information, create an account, or provide a password.
+This website does not require visitors to submit personal information, create an account, provide authentication credentials, or disclose any unnecessary identifying details.
 
-To determine your public IP address, the website sends a request to the **ipify API**. Because the request comes from your device, ipify can see the public IP address making that request.
+In order to determine your public IP address, the website communicates with the **ipify API** through an external network request. Since this request originates from your device and must travel across the internet, ipify is able to identify the public IP address associated with that request.
 
-The website itself does not store your IP address or send it to a personal database.
+The website itself does **not** collect, retain, or transmit your IP address to a privately operated database or other storage system. The displayed IP address is obtained solely for the purpose of providing the requested information to you.
 
-Keep in mind that using any online IP-checking service means the service receiving the request may be able to see your public IP address. Your public IP address is normally visible to websites and online services you connect to.
+It is important to understand, however, that any online service used to determine a public IP address may inherently have access to the IP address from which the request originates. A public IP address is generally exposed to websites, servers, and other internet services whenever your device establishes a connection with them.
+
 
 ## 🛠️ How It Works
 
