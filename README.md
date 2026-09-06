@@ -28,18 +28,6 @@ The website uses the [ipify API](https://api.ipify.org/) to determine the public
 
 Your public IP will then be displayed directly on the webpage.
 
-## 📁 Files
-
-```text
-index.html
-README.md
-```
-
-## 🚀 Usage
-
-Visit our website in your web browser to see your ip.
-
-That's it! Your public IP address will be displayed automatically.
 
 ## ℹ️ Note
 
