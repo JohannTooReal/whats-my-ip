@@ -1,1 +1,73 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My IP Address</title>
 
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: #f4f4f4;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        #ip {
+            font-size: 28px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        #status {
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>🌐 Your Public IP</h1>
+
+        <p id="status">Checking your IP address...</p>
+
+        <div id="ip">Loading...</div>
+    </div>
+
+    <script>
+        fetch("https://api.ipify.org?format=json")
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("status").textContent =
+                    "Your public IP address is:";
+
+                document.getElementById("ip").textContent = data.ip;
+            })
+            .catch(error => {
+                document.getElementById("status").textContent =
+                    "Unable to determine your IP address.";
+
+                document.getElementById("ip").textContent = "";
+            });
+    </script>
+
+</body>
+</html>
+```
