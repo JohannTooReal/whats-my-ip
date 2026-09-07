@@ -6,172 +6,368 @@
     <title>My IP Address</title>
 
     <style>
-        :root {
-            --primary-color: #0066cc;
-            --text-color: #333;
-            --border-color: #ddd;
-        }
+:root{
+  --bg:#050816;
+  --panel:rgba(12,18,38,.72);
+  --line:rgba(120,150,255,.18);
+  --text:#f5f7ff;
+  --muted:#8e9ab8;
+  --accent:#65d8ff;
+  --accent2:#8b5cf6;
+  --good:#55f0a7;
+  --danger:#ff6685;
+}
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        }
+*{box-sizing:border-box}
 
-        .container {
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
-            max-width: 500px;
-            width: 90%;
-        }
+html,body{min-height:100%}
 
-        h1 {
-            margin: 0 0 20px 0;
-            color: var(--text-color);
-        }
+body{
+  margin:0;
+  min-height:100vh;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 50% 40%,rgba(70,100,255,.16),transparent 35%),
+    radial-gradient(circle at 15% 85%,rgba(0,220,255,.10),transparent 30%),
+    var(--bg);
+}
 
-        #status {
-            color: #666;
-            font-size: 16px;
-            min-height: 24px;
-        }
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  opacity:.32;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:45px 45px;
+  mask-image:linear-gradient(to bottom,transparent,#000 20%,#000 80%,transparent);
+}
 
-        #ip {
-            font-size: 32px;
-            font-weight: bold;
-            margin: 30px 0;
-            font-family: 'Courier New', monospace;
-            color: var(--primary-color);
-            word-break: break-all;
-        }
+.orb{
+  position:fixed;
+  width:420px;
+  height:420px;
+  border-radius:50%;
+  filter:blur(75px);
+  opacity:.16;
+  pointer-events:none;
+  animation:float 9s ease-in-out infinite;
+}
+.orb.one{background:#4f46e5;top:-170px;left:-100px}
+.orb.two{background:#00d9ff;right:-160px;bottom:-170px;animation-delay:-4s}
 
-        .button-group {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 20px;
-        }
+.container{
+  position:relative;
+  width:min(92%,560px);
+  padding:44px 42px 38px;
+  text-align:center;
+  border:1px solid var(--line);
+  border-radius:28px;
+  background:linear-gradient(145deg,rgba(20,28,57,.82),rgba(7,11,27,.76));
+  box-shadow:0 30px 100px rgba(0,0,0,.45),inset 0 1px rgba(255,255,255,.06);
+  backdrop-filter:blur(24px);
+  animation:cardIn .8s cubic-bezier(.2,.8,.2,1);
+}
 
-        button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s ease;
-        }
+.container::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:28px;
+  pointer-events:none;
+  background:linear-gradient(120deg,transparent 30%,rgba(101,216,255,.07),transparent 70%);
+  transform:translateX(-100%);
+  animation:shine 6s ease-in-out infinite;
+}
 
-        #copyBtn {
-            background-color: var(--primary-color);
-            color: white;
-        }
+.logo{
+  width:72px;
+  height:72px;
+  margin:0 auto 20px;
+  display:grid;
+  place-items:center;
+  border-radius:22px;
+  font-size:34px;
+  background:linear-gradient(135deg,rgba(101,216,255,.18),rgba(139,92,246,.22));
+  border:1px solid rgba(130,160,255,.22);
+  box-shadow:0 0 35px rgba(101,216,255,.10);
+  animation:logoFloat 3s ease-in-out infinite;
+}
 
-        #copyBtn:hover {
-            background-color: #0052a3;
-        }
+h1{
+  margin:0;
+  font-size:clamp(28px,5vw,38px);
+  letter-spacing:-1.5px;
+  line-height:1.05;
+}
 
-        #retryBtn {
-            background-color: #f0f0f0;
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
-        }
+.subtitle{
+  margin:11px 0 30px;
+  color:var(--muted);
+  font-size:14px;
+}
 
-        #retryBtn:hover {
-            background-color: #e0e0e0;
-        }
+#status{
+  min-height:24px;
+  margin:0 0 13px;
+  color:#aeb8d0;
+  font-size:14px;
+  transition:all .35s ease;
+}
 
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
+#ip{
+  position:relative;
+  min-height:74px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:10px 0 28px;
+  padding:18px;
+  border-radius:18px;
+  border:1px solid rgba(120,150,255,.14);
+  background:rgba(3,7,20,.45);
+  font:700 clamp(25px,6vw,38px)/1.1 "SFMono-Regular",Consolas,"Liberation Mono",monospace;
+  letter-spacing:1px;
+  color:var(--accent);
+  text-shadow:0 0 22px rgba(101,216,255,.38);
+  word-break:break-all;
+  overflow:hidden;
+}
 
-        .spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid var(--primary-color);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-right: 10px;
-            vertical-align: middle;
-        }
+#ip::before{
+  content:"";
+  position:absolute;
+  left:-30%;
+  top:0;
+  width:30%;
+  height:100%;
+  background:linear-gradient(90deg,transparent,rgba(101,216,255,.10),transparent);
+  animation:scan 2.2s linear infinite;
+}
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+.loading-content{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:13px;
+  font-size:18px;
+  letter-spacing:.5px;
+}
 
-        .error {
-            color: #d32f2f;
-            background-color: #ffebee;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 20px 0;
-        }
+.loader{
+  width:30px;
+  height:30px;
+  position:relative;
+  border-radius:50%;
+  border:2px solid rgba(101,216,255,.16);
+  border-top-color:var(--accent);
+  border-right-color:var(--accent2);
+  animation:spin .8s linear infinite;
+  box-shadow:0 0 18px rgba(101,216,255,.22);
+}
 
-        .success-message {
-            color: #388e3c;
-            font-size: 14px;
-            margin-top: 8px;
-        }
+.loader::after{
+  content:"";
+  position:absolute;
+  inset:5px;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,.10);
+  border-bottom-color:var(--accent);
+  animation:spin 1.3s linear reverse infinite;
+}
 
-        @media (max-width: 480px) {
-            .container {
-                padding: 30px 20px;
-            }
+.progress{
+  height:4px;
+  margin:-14px 0 28px;
+  overflow:hidden;
+  border-radius:10px;
+  background:rgba(255,255,255,.06);
+}
+.progress-bar{
+  width:35%;
+  height:100%;
+  border-radius:inherit;
+  background:linear-gradient(90deg,var(--accent2),var(--accent));
+  box-shadow:0 0 14px rgba(101,216,255,.6);
+  animation:progress 1.5s ease-in-out infinite;
+}
 
-            #ip {
-                font-size: 24px;
-            }
+.button-group{
+  display:flex;
+  gap:12px;
+  justify-content:center;
+  flex-wrap:wrap;
+}
 
-            .button-group {
-                flex-direction: column;
-            }
+button{
+  min-width:135px;
+  padding:13px 20px;
+  border:1px solid rgba(120,150,255,.18);
+  border-radius:14px;
+  color:var(--text);
+  background:rgba(255,255,255,.055);
+  cursor:pointer;
+  font:600 14px inherit;
+  transition:transform .25s ease,box-shadow .25s ease,background .25s ease;
+}
 
-            button {
-                width: 100%;
-            }
-        }
-    </style>
+button:hover:not(:disabled){
+  transform:translateY(-3px);
+  background:rgba(255,255,255,.10);
+  box-shadow:0 12px 30px rgba(0,0,0,.22);
+}
+
+#copyBtn{
+  color:#03131b;
+  border:0;
+  background:linear-gradient(135deg,var(--accent),#76f3cf);
+  box-shadow:0 8px 25px rgba(101,216,255,.18);
+}
+#copyBtn:hover:not(:disabled){
+  box-shadow:0 14px 34px rgba(101,216,255,.28);
+}
+
+button:disabled{opacity:.38;cursor:not-allowed}
+
+#retryBtn{display:none}
+
+.error{
+  display:block;
+  padding:12px 14px;
+  border:1px solid rgba(255,102,133,.2);
+  border-radius:12px;
+  color:#ff9eb1;
+  background:rgba(255,70,100,.08);
+  animation:shake .4s ease;
+}
+
+.success-message{
+  display:block;
+  margin-top:14px;
+  color:var(--good);
+  font-size:13px;
+  animation:pop .35s ease;
+}
+
+.meta{
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  align-items:center;
+  margin-top:25px;
+  color:#687493;
+  font-size:11px;
+  letter-spacing:.5px;
+}
+.dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--good);
+  box-shadow:0 0 10px var(--good);
+  animation:pulse 1.6s infinite;
+}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes float{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-25px)}}
+@keyframes logoFloat{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-6px) rotate(2deg)}}
+@keyframes cardIn{from{opacity:0;transform:translateY(25px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes shine{0%,65%{transform:translateX(-100%)}80%,100%{transform:translateX(160%)}}
+@keyframes scan{from{left:-30%}to{left:130%}}
+@keyframes progress{0%{transform:translateX(-130%)}50%{transform:translateX(150%)}100%{transform:translateX(350%)}}
+@keyframes pulse{0%,100%{opacity:.45;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+@keyframes pop{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@media(max-width:480px){
+  .container{padding:34px 22px 28px;border-radius:22px}
+  .container::after{border-radius:22px}
+  .logo{width:62px;height:62px;border-radius:19px}
+  #ip{font-size:23px;min-height:68px}
+  button{width:100%}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}
+}
+</style>
 </head>
 
 <body>
-    <div class="container">
-        <h1>🌐 Your Public IP</h1>
-        <p id="status" aria-live="polite" aria-atomic="true">Checking your IP address...</p>
+    <div class="orb one"></div>
+    <div class="orb two"></div>
+
+    <main class="container">
+        <div class="logo" aria-hidden="true">🌐</div>
+        <h1>Your Public IP</h1>
+        <p class="subtitle">Securely checking the address visible to the internet</p>
+
+        <p id="status" aria-live="polite" aria-atomic="true">Initializing network check...</p>
+
         <div id="ip" aria-label="Your public IP address">
-            <span class="spinner"></span>Loading...
+            <div class="loading-content">
+                <span class="loader" aria-hidden="true"></span>
+                <span>Finding your IP<span id="loadingDots">...</span></span>
+            </div>
         </div>
+
+        <div class="progress" aria-hidden="true">
+            <div class="progress-bar"></div>
+        </div>
+
         <div class="button-group">
-            <button id="copyBtn" onclick="copyIP()" disabled>📋 Copy</button>
-            <button id="retryBtn" onclick="fetchIP()" style="display: none;">🔄 Retry</button>
+            <button id="copyBtn" onclick="copyIP()" disabled>📋 Copy IP</button>
+            <button id="retryBtn" onclick="fetchIP()">↻ Try Again</button>
         </div>
+
         <div id="copyMessage"></div>
-    </div>
+
+        <div class="meta">
+            <span class="dot"></span>
+            <span>IPIFY API · LIVE CHECK</span>
+        </div>
+    </main>
 
     <script>
         const API_URL = "https://api.ipify.org?format=json";
         const TIMEOUT_MS = 8000;
 
         let currentIP = null;
+        let dotTimer = null;
+
+        function startLoadingAnimation() {
+            let dots = 0;
+            clearInterval(dotTimer);
+            dotTimer = setInterval(() => {
+                dots = (dots + 1) % 4;
+                const el = document.getElementById("loadingDots");
+                if (el) el.textContent = ".".repeat(dots);
+            }, 350);
+        }
+
+        function stopLoadingAnimation() {
+            clearInterval(dotTimer);
+            dotTimer = null;
+        }
 
         async function fetchIP() {
             try {
-                // Reset UI
-                document.getElementById("status").textContent = "Checking your IP address...";
-                document.getElementById("ip").innerHTML = '<span class="spinner"></span>Loading...';
+                currentIP = null;
+                startLoadingAnimation();
+
+                document.getElementById("status").textContent = "Connecting to IP detection service...";
+                document.getElementById("ip").innerHTML =
+                    '<div class="loading-content"><span class="loader" aria-hidden="true"></span><span>Finding your IP<span id="loadingDots">...</span></span></div>';
                 document.getElementById("copyBtn").disabled = true;
                 document.getElementById("retryBtn").style.display = "none";
                 document.getElementById("copyMessage").innerHTML = "";
+
+                await new Promise(resolve => setTimeout(resolve, 450));
+
+                document.getElementById("status").textContent = "Reading your public network address...";
 
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
@@ -190,11 +386,14 @@
                 }
 
                 currentIP = data.ip;
-                document.getElementById("status").textContent = "Your public IP address is:";
+                stopLoadingAnimation();
+
+                document.getElementById("status").textContent = "Connection verified • Public IP found";
                 document.getElementById("ip").textContent = currentIP;
                 document.getElementById("copyBtn").disabled = false;
 
             } catch (error) {
+                stopLoadingAnimation();
                 handleError(error);
             }
         }
@@ -228,7 +427,6 @@
             });
         }
 
-        // Fetch IP on page load
         fetchIP();
     </script>
 </body>
