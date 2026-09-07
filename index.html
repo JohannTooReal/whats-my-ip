@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -60,8 +61,19 @@ body::before{
   pointer-events:none;
   animation:float 9s ease-in-out infinite;
 }
-.orb.one{background:#4f46e5;top:-170px;left:-100px}
-.orb.two{background:#00d9ff;right:-160px;bottom:-170px;animation-delay:-4s}
+
+.orb.one{
+  background:#4f46e5;
+  top:-170px;
+  left:-100px;
+}
+
+.orb.two{
+  background:#00d9ff;
+  right:-160px;
+  bottom:-170px;
+  animation-delay:-4s;
+}
 
 .container{
   position:relative;
@@ -70,21 +82,35 @@ body::before{
   text-align:center;
   border:1px solid var(--line);
   border-radius:28px;
-  background:linear-gradient(145deg,rgba(20,28,57,.82),rgba(7,11,27,.76));
-  box-shadow:0 30px 100px rgba(0,0,0,.45),inset 0 1px rgba(255,255,255,.06);
+  background:linear-gradient(
+    145deg,
+    rgba(20,28,57,.82),
+    rgba(7,11,27,.76)
+  );
+  box-shadow:
+    0 30px 100px rgba(0,0,0,.45),
+    inset 0 1px rgba(255,255,255,.06);
   backdrop-filter:blur(24px);
   animation:cardIn .8s cubic-bezier(.2,.8,.2,1);
 }
 
+/* Smooth horizontal shine */
 .container::after{
   content:"";
   position:absolute;
   inset:0;
   border-radius:28px;
   pointer-events:none;
-  background:linear-gradient(120deg,transparent 30%,rgba(101,216,255,.07),transparent 70%);
+
+  background:linear-gradient(
+    90deg,
+    transparent 25%,
+    rgba(101,216,255,.07) 50%,
+    transparent 75%
+  );
+
   transform:translateX(-100%);
-  animation:shine 6s ease-in-out infinite;
+  animation:shine 9s ease-in-out infinite;
 }
 
 .logo{
@@ -95,7 +121,11 @@ body::before{
   place-items:center;
   border-radius:22px;
   font-size:34px;
-  background:linear-gradient(135deg,rgba(101,216,255,.18),rgba(139,92,246,.22));
+  background:linear-gradient(
+    135deg,
+    rgba(101,216,255,.18),
+    rgba(139,92,246,.22)
+  );
   border:1px solid rgba(130,160,255,.22);
   box-shadow:0 0 35px rgba(101,216,255,.10);
   animation:logoFloat 3s ease-in-out infinite;
@@ -133,7 +163,12 @@ h1{
   border-radius:18px;
   border:1px solid rgba(120,150,255,.14);
   background:rgba(3,7,20,.45);
-  font:700 clamp(25px,6vw,38px)/1.1 "SFMono-Regular",Consolas,"Liberation Mono",monospace;
+  font:
+    700 clamp(25px,6vw,38px)/1.1
+    "SFMono-Regular",
+    Consolas,
+    "Liberation Mono",
+    monospace;
   letter-spacing:1px;
   color:var(--accent);
   text-shadow:0 0 22px rgba(101,216,255,.38);
@@ -148,7 +183,12 @@ h1{
   top:0;
   width:30%;
   height:100%;
-  background:linear-gradient(90deg,transparent,rgba(101,216,255,.10),transparent);
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(101,216,255,.10),
+    transparent
+  );
   animation:scan 2.2s linear infinite;
 }
 
@@ -190,11 +230,16 @@ h1{
   border-radius:10px;
   background:rgba(255,255,255,.06);
 }
+
 .progress-bar{
   width:35%;
   height:100%;
   border-radius:inherit;
-  background:linear-gradient(90deg,var(--accent2),var(--accent));
+  background:linear-gradient(
+    90deg,
+    var(--accent2),
+    var(--accent)
+  );
   box-shadow:0 0 14px rgba(101,216,255,.6);
   animation:progress 1.5s ease-in-out infinite;
 }
@@ -215,7 +260,10 @@ button{
   background:rgba(255,255,255,.055);
   cursor:pointer;
   font:600 14px inherit;
-  transition:transform .25s ease,box-shadow .25s ease,background .25s ease;
+  transition:
+    transform .25s ease,
+    box-shadow .25s ease,
+    background .25s ease;
 }
 
 button:hover:not(:disabled){
@@ -227,16 +275,26 @@ button:hover:not(:disabled){
 #copyBtn{
   color:#03131b;
   border:0;
-  background:linear-gradient(135deg,var(--accent),#76f3cf);
+  background:linear-gradient(
+    135deg,
+    var(--accent),
+    #76f3cf
+  );
   box-shadow:0 8px 25px rgba(101,216,255,.18);
 }
+
 #copyBtn:hover:not(:disabled){
   box-shadow:0 14px 34px rgba(101,216,255,.28);
 }
 
-button:disabled{opacity:.38;cursor:not-allowed}
+button:disabled{
+  opacity:.38;
+  cursor:not-allowed;
+}
 
-#retryBtn{display:none}
+#retryBtn{
+  display:none;
+}
 
 .error{
   display:block;
@@ -266,52 +324,197 @@ button:disabled{opacity:.38;cursor:not-allowed}
   font-size:11px;
   letter-spacing:.5px;
 }
+
 .dot{
-  width:6px;height:6px;border-radius:50%;
+  width:6px;
+  height:6px;
+  border-radius:50%;
   background:var(--good);
   box-shadow:0 0 10px var(--good);
   animation:pulse 1.6s infinite;
 }
 
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes float{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-25px)}}
-@keyframes logoFloat{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-6px) rotate(2deg)}}
-@keyframes cardIn{from{opacity:0;transform:translateY(25px) scale(.97)}to{opacity:1;transform:none}}
-@keyframes shine{0%,65%{transform:translateX(-100%)}80%,100%{transform:translateX(160%)}}
-@keyframes scan{from{left:-30%}to{left:130%}}
-@keyframes progress{0%{transform:translateX(-130%)}50%{transform:translateX(150%)}100%{transform:translateX(350%)}}
-@keyframes pulse{0%,100%{opacity:.45;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
-@keyframes pop{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
-@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
-@media(max-width:480px){
-  .container{padding:34px 22px 28px;border-radius:22px}
-  .container::after{border-radius:22px}
-  .logo{width:62px;height:62px;border-radius:19px}
-  #ip{font-size:23px;min-height:68px}
-  button{width:100%}
+@keyframes spin{
+  to{
+    transform:rotate(360deg);
+  }
 }
+
+@keyframes float{
+  0%,100%{
+    transform:translate(0,0);
+  }
+
+  50%{
+    transform:translate(30px,-25px);
+  }
+}
+
+@keyframes logoFloat{
+  0%,100%{
+    transform:translateY(0) rotate(0);
+  }
+
+  50%{
+    transform:translateY(-6px) rotate(2deg);
+  }
+}
+
+@keyframes cardIn{
+  from{
+    opacity:0;
+    transform:translateY(25px) scale(.97);
+  }
+
+  to{
+    opacity:1;
+    transform:none;
+  }
+}
+
+/* Left → Right → Left */
+@keyframes shine{
+  0%{
+    transform:translateX(-100%);
+  }
+
+  50%{
+    transform:translateX(100%);
+  }
+
+  100%{
+    transform:translateX(-100%);
+  }
+}
+
+@keyframes scan{
+  from{
+    left:-30%;
+  }
+
+  to{
+    left:130%;
+  }
+}
+
+@keyframes progress{
+  0%{
+    transform:translateX(-130%);
+  }
+
+  50%{
+    transform:translateX(150%);
+  }
+
+  100%{
+    transform:translateX(350%);
+  }
+}
+
+@keyframes pulse{
+  0%,100%{
+    opacity:.45;
+    transform:scale(.8);
+  }
+
+  50%{
+    opacity:1;
+    transform:scale(1.2);
+  }
+}
+
+@keyframes pop{
+  from{
+    opacity:0;
+    transform:scale(.9);
+  }
+
+  to{
+    opacity:1;
+    transform:none;
+  }
+}
+
+@keyframes shake{
+  25%{
+    transform:translateX(-5px);
+  }
+
+  75%{
+    transform:translateX(5px);
+  }
+}
+
+@media(max-width:480px){
+  .container{
+    padding:34px 22px 28px;
+    border-radius:22px;
+  }
+
+  .container::after{
+    border-radius:22px;
+  }
+
+  .logo{
+    width:62px;
+    height:62px;
+    border-radius:19px;
+  }
+
+  #ip{
+    font-size:23px;
+    min-height:68px;
+  }
+
+  button{
+    width:100%;
+  }
+}
+
 @media(prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}
+  *,
+  *::before,
+  *::after{
+    animation-duration:.001ms!important;
+    animation-iteration-count:1!important;
+    scroll-behavior:auto!important;
+  }
 }
 </style>
 </head>
 
 <body>
+
     <div class="orb one"></div>
     <div class="orb two"></div>
 
     <main class="container">
-        <div class="logo" aria-hidden="true">🌐</div>
-        <h1>Your Public IP Address</h1>
-        <p class="subtitle">Securely identifying the network address that is visible to the internet</p>
 
-        <p id="status" aria-live="polite" aria-atomic="true">Initializing secure network connectivity check...</p>
+        <div class="logo" aria-hidden="true">🌐</div>
+
+        <h1>Your Public IP Address</h1>
+
+        <p class="subtitle">
+            Securely identifying the network address that is visible to the internet
+        </p>
+
+        <p id="status" aria-live="polite" aria-atomic="true">
+            Initializing secure network connectivity check...
+        </p>
 
         <div id="ip" aria-label="Your public IP address">
+
             <div class="loading-content">
+
                 <span class="loader" aria-hidden="true"></span>
-                <span>Retrieving your IP address<span id="loadingDots">...</span></span>
+
+                <span>
+                    Retrieving your IP address
+                    <span id="loadingDots">...</span>
+                </span>
+
             </div>
+
         </div>
 
         <div class="progress" aria-hidden="true">
@@ -319,16 +522,29 @@ button:disabled{opacity:.38;cursor:not-allowed}
         </div>
 
         <div class="button-group">
-            <button id="copyBtn" onclick="copyIP()" disabled>📋 Copy IP Address</button>
-            <button id="retryBtn" onclick="fetchIP()">↻ Retry Connection</button>
+
+            <button id="copyBtn" onclick="copyIP()" disabled>
+                📋 Copy IP Address
+            </button>
+
+            <button id="retryBtn" onclick="fetchIP()">
+                ↻ Retry Connection
+            </button>
+
         </div>
 
         <div id="copyMessage"></div>
 
         <div class="meta">
+
             <span class="dot"></span>
-            <span>Powered by IPIFY API · Real-Time Live Check</span>
+
+            <span>
+                Powered by IPIFY API · Real-Time Live Check
+            </span>
+
         </div>
+
     </main>
 
     <script>
@@ -340,11 +556,19 @@ button:disabled{opacity:.38;cursor:not-allowed}
 
         function startLoadingAnimation() {
             let dots = 0;
+
             clearInterval(dotTimer);
+
             dotTimer = setInterval(() => {
+
                 dots = (dots + 1) % 4;
+
                 const el = document.getElementById("loadingDots");
-                if (el) el.textContent = ".".repeat(dots);
+
+                if (el) {
+                    el.textContent = ".".repeat(dots);
+                }
+
             }, 350);
         }
 
@@ -354,29 +578,53 @@ button:disabled{opacity:.38;cursor:not-allowed}
         }
 
         async function fetchIP() {
+
             try {
+
                 currentIP = null;
+
                 startLoadingAnimation();
 
-                document.getElementById("status").textContent = "Establishing connection to the IP detection service...";
+                document.getElementById("status").textContent =
+                    "Establishing connection to the IP detection service...";
+
                 document.getElementById("ip").innerHTML =
-                    '<div class="loading-content"><span class="loader" aria-hidden="true"></span><span>Retrieving your IP address<span id="loadingDots">...</span></span></div>';
+                    '<div class="loading-content">' +
+                    '<span class="loader" aria-hidden="true"></span>' +
+                    '<span>Retrieving your IP address' +
+                    '<span id="loadingDots">...</span>' +
+                    '</span>' +
+                    '</div>';
+
                 document.getElementById("copyBtn").disabled = true;
+
                 document.getElementById("retryBtn").style.display = "none";
+
                 document.getElementById("copyMessage").innerHTML = "";
 
                 await new Promise(resolve => setTimeout(resolve, 450));
 
-                document.getElementById("status").textContent = "Reading your public network address...";
+                document.getElementById("status").textContent =
+                    "Reading your public network address...";
 
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
-                const response = await fetch(API_URL, { signal: controller.signal });
+                const timeoutId = setTimeout(
+                    () => controller.abort(),
+                    TIMEOUT_MS
+                );
+
+                const response = await fetch(
+                    API_URL,
+                    { signal: controller.signal }
+                );
+
                 clearTimeout(timeoutId);
 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error(
+                        `HTTP error! status: ${response.status}`
+                    );
                 }
 
                 const data = await response.json();
@@ -386,48 +634,86 @@ button:disabled{opacity:.38;cursor:not-allowed}
                 }
 
                 currentIP = data.ip;
+
                 stopLoadingAnimation();
 
-                document.getElementById("status").textContent = "Connection verified successfully • Your public IP address has been identified";
-                document.getElementById("ip").textContent = currentIP;
+                document.getElementById("status").textContent =
+                    "Connection verified successfully • Your public IP address has been identified";
+
+                document.getElementById("ip").textContent =
+                    currentIP;
+
                 document.getElementById("copyBtn").disabled = false;
 
             } catch (error) {
+
                 stopLoadingAnimation();
+
                 handleError(error);
             }
         }
 
         function handleError(error) {
-            let errorMessage = "Unable to determine your IP address.";
+
+            let errorMessage =
+                "Unable to determine your IP address.";
 
             if (error.name === "AbortError") {
-                errorMessage = "The request timed out. Please check your internet connection and try again.";
+
+                errorMessage =
+                    "The request timed out. Please check your internet connection and try again.";
+
             } else if (error instanceof TypeError) {
-                errorMessage = "A network error occurred. Please verify your internet connection and try again.";
+
+                errorMessage =
+                    "A network error occurred. Please verify your internet connection and try again.";
+
             }
 
-            document.getElementById("status").innerHTML = `<span class="error">${errorMessage}</span>`;
+            document.getElementById("status").innerHTML =
+                `<span class="error">${errorMessage}</span>`;
+
             document.getElementById("ip").textContent = "";
-            document.getElementById("retryBtn").style.display = "inline-block";
+
+            document.getElementById("retryBtn").style.display =
+                "inline-block";
+
             document.getElementById("copyBtn").disabled = true;
         }
 
         function copyIP() {
+
             if (!currentIP) return;
 
-            navigator.clipboard.writeText(currentIP).then(() => {
-                const messageEl = document.getElementById("copyMessage");
-                messageEl.innerHTML = '<span class="success-message">✓ Successfully copied to clipboard!</span>';
-                setTimeout(() => {
-                    messageEl.innerHTML = "";
-                }, 2000);
-            }).catch(() => {
-                alert("Failed to copy IP address");
-            });
+            navigator.clipboard
+                .writeText(currentIP)
+                .then(() => {
+
+                    const messageEl =
+                        document.getElementById("copyMessage");
+
+                    messageEl.innerHTML =
+                        '<span class="success-message">' +
+                        '✓ Successfully copied to clipboard!' +
+                        '</span>';
+
+                    setTimeout(() => {
+
+                        messageEl.innerHTML = "";
+
+                    }, 2000);
+
+                })
+                .catch(() => {
+
+                    alert("Failed to copy IP address");
+
+                });
         }
 
         fetchIP();
     </script>
+
 </body>
 </html>
+```
