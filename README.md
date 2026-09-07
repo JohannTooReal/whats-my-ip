@@ -112,4 +112,4 @@ Its main philosophy is straightforward:
 
 The project is open source and can be modified or distributed according to its license.
 
-**Last Updated:** September 7th 2026
+**Last Updated:** September 2026
