@@ -6,14 +6,20 @@
     <title>My IP Address</title>
 
     <style>
+        :root {
+            --primary-color: #0066cc;
+            --text-color: #333;
+            --border-color: #ddd;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            background: #f4f4f4;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
         }
 
         .container {
@@ -21,51 +27,209 @@
             padding: 40px;
             border-radius: 15px;
             text-align: center;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            max-width: 500px;
+            width: 90%;
         }
 
         h1 {
-            margin-bottom: 10px;
-        }
-
-        #ip {
-            font-size: 28px;
-            font-weight: bold;
-            margin-top: 20px;
+            margin: 0 0 20px 0;
+            color: var(--text-color);
         }
 
         #status {
             color: #666;
+            font-size: 16px;
+            min-height: 24px;
+        }
+
+        #ip {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 30px 0;
+            font-family: 'Courier New', monospace;
+            color: var(--primary-color);
+            word-break: break-all;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        #copyBtn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        #copyBtn:hover {
+            background-color: #0052a3;
+        }
+
+        #retryBtn {
+            background-color: #f0f0f0;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        #retryBtn:hover {
+            background-color: #e0e0e0;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            color: #d32f2f;
+            background-color: #ffebee;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .success-message {
+            color: #388e3c;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            #ip {
+                font-size: 24px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
         }
     </style>
 </head>
 
 <body>
-
     <div class="container">
         <h1>🌐 Your Public IP</h1>
-
-        <p id="status">Checking your IP address...</p>
-
-        <div id="ip">Loading...</div>
+        <p id="status" aria-live="polite" aria-atomic="true">Checking your IP address...</p>
+        <div id="ip" aria-label="Your public IP address">
+            <span class="spinner"></span>Loading...
+        </div>
+        <div class="button-group">
+            <button id="copyBtn" onclick="copyIP()" disabled>📋 Copy</button>
+            <button id="retryBtn" onclick="fetchIP()" style="display: none;">🔄 Retry</button>
+        </div>
+        <div id="copyMessage"></div>
     </div>
 
     <script>
-        fetch("https://api.ipify.org?format=json")
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("status").textContent =
-                    "Your public IP address is:";
+        const API_URL = "https://api.ipify.org?format=json";
+        const TIMEOUT_MS = 8000;
 
-                document.getElementById("ip").textContent = data.ip;
-            })
-            .catch(error => {
-                document.getElementById("status").textContent =
-                    "Unable to determine your IP address.";
+        let currentIP = null;
 
-                document.getElementById("ip").textContent = "";
+        async function fetchIP() {
+            try {
+                // Reset UI
+                document.getElementById("status").textContent = "Checking your IP address...";
+                document.getElementById("ip").innerHTML = '<span class="spinner"></span>Loading...';
+                document.getElementById("copyBtn").disabled = true;
+                document.getElementById("retryBtn").style.display = "none";
+                document.getElementById("copyMessage").innerHTML = "";
+
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
+                const response = await fetch(API_URL, { signal: controller.signal });
+                clearTimeout(timeoutId);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (!data.ip) {
+                    throw new Error("Invalid response format");
+                }
+
+                currentIP = data.ip;
+                document.getElementById("status").textContent = "Your public IP address is:";
+                document.getElementById("ip").textContent = currentIP;
+                document.getElementById("copyBtn").disabled = false;
+
+            } catch (error) {
+                handleError(error);
+            }
+        }
+
+        function handleError(error) {
+            let errorMessage = "Unable to determine your IP address.";
+
+            if (error.name === "AbortError") {
+                errorMessage = "Request timed out. Please check your connection and try again.";
+            } else if (error instanceof TypeError) {
+                errorMessage = "Network error. Please check your internet connection.";
+            }
+
+            document.getElementById("status").innerHTML = `<span class="error">${errorMessage}</span>`;
+            document.getElementById("ip").textContent = "";
+            document.getElementById("retryBtn").style.display = "inline-block";
+            document.getElementById("copyBtn").disabled = true;
+        }
+
+        function copyIP() {
+            if (!currentIP) return;
+
+            navigator.clipboard.writeText(currentIP).then(() => {
+                const messageEl = document.getElementById("copyMessage");
+                messageEl.innerHTML = '<span class="success-message">✓ Copied to clipboard!</span>';
+                setTimeout(() => {
+                    messageEl.innerHTML = "";
+                }, 2000);
+            }).catch(() => {
+                alert("Failed to copy IP address");
             });
-    </script>
+        }
 
+        // Fetch IP on page load
+        fetchIP();
+    </script>
 </body>
 </html>
