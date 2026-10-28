@@ -1,718 +1,569 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Public IP Address Checker - Find Your IP Online</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#050816">
+  <meta name="description" content="Check the public IP address visible to the internet.">
+  <title>Public IP Address Checker</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #050816;
+      --panel: rgba(12, 18, 38, .76);
+      --line: rgba(120, 150, 255, .2);
+      --text: #f5f7ff;
+      --muted: #98a4c2;
+      --accent: #65d8ff;
+      --accent2: #9a72ff;
+      --good: #55f0a7;
+      --danger: #ff829c;
+    }
 
-    <style>
-:root{
-  --bg:#050816;
-  --panel:rgba(12,18,38,.72);
-  --line:rgba(120,150,255,.18);
-  --text:#f5f7ff;
-  --muted:#8e9ab8;
-  --accent:#65d8ff;
-  --accent2:#8b5cf6;
-  --good:#55f0a7;
-  --danger:#ff6685;
-}
+    * { box-sizing: border-box; }
+    html { min-height: 100%; }
+    body {
+      min-height: 100svh;
+      margin: 0;
+      padding: 28px 16px;
+      display: grid;
+      place-items: center;
+      overflow-x: hidden;
+      isolation: isolate;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse at 50% 42%, rgba(70, 100, 255, .17), transparent 38%),
+        radial-gradient(ellipse at 10% 90%, rgba(0, 220, 255, .09), transparent 34%),
+        var(--bg);
+    }
 
-*{box-sizing:border-box}
+    /* Static grid: avoids animating a large full-screen background. */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+      opacity: .28;
+      background-image:
+        linear-gradient(rgba(255,255,255,.027) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.027) 1px, transparent 1px);
+      background-size: 46px 46px;
+      mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 82%, transparent);
+    }
 
-html,body{min-height:100%}
+    .ambient {
+      position: fixed;
+      z-index: -1;
+      width: clamp(230px, 40vw, 480px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      pointer-events: none;
+      filter: blur(68px);
+      opacity: .19;
+      will-change: transform;
+      transform: translate3d(0, 0, 0);
+      animation: drift 16s cubic-bezier(.45, 0, .55, 1) infinite alternate;
+    }
+    .ambient.one {
+      top: -180px;
+      left: -130px;
+      background: #5546ff;
+    }
+    .ambient.two {
+      right: -170px;
+      bottom: -180px;
+      background: #00d9ff;
+      animation-duration: 21s;
+      animation-delay: -7s;
+    }
+    .ambient.three {
+      top: 42%;
+      left: 72%;
+      width: clamp(140px, 22vw, 260px);
+      background: #a34dff;
+      opacity: .1;
+      animation-duration: 18s;
+      animation-delay: -11s;
+    }
 
-body{
-  margin:0;
-  min-height:100vh;
-  overflow:hidden;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
-  color:var(--text);
-  background:
-    radial-gradient(circle at 50% 40%,rgba(70,100,255,.16),transparent 35%),
-    radial-gradient(circle at 15% 85%,rgba(0,220,255,.10),transparent 30%),
-    var(--bg);
-}
+    .container {
+      position: relative;
+      width: min(100%, 570px);
+      padding: clamp(28px, 5vw, 44px) clamp(20px, 5vw, 42px) 34px;
+      text-align: center;
+      border: 1px solid transparent;
+      border-radius: 28px;
+      background:
+        linear-gradient(145deg, rgba(20,28,57,.88), rgba(7,11,27,.84)) padding-box,
+        linear-gradient(135deg, rgba(101,216,255,.42), rgba(139,92,246,.24), rgba(101,216,255,.12)) border-box;
+      box-shadow: 0 30px 100px rgba(0,0,0,.42), inset 0 1px rgba(255,255,255,.07);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      overflow: hidden;
+      animation: card-enter .8s cubic-bezier(.16, 1, .3, 1) both;
+    }
 
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  opacity:.32;
-  background-image:
-    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
-  background-size:45px 45px;
-  mask-image:linear-gradient(to bottom,transparent,#000 20%,#000 80%,transparent);
-}
+    .container::before {
+      content: "";
+      position: absolute;
+      inset: -40% -70%;
+      pointer-events: none;
+      background: linear-gradient(110deg, transparent 42%, rgba(101,216,255,.055) 49%, rgba(180,160,255,.09) 51%, transparent 58%);
+      transform: translate3d(-35%, 0, 0) rotate(8deg);
+      animation: glass-sweep 10s cubic-bezier(.45, 0, .55, 1) infinite;
+    }
 
-.orb{
-  position:fixed;
-  width:420px;
-  height:420px;
-  border-radius:50%;
-  filter:blur(75px);
-  opacity:.16;
-  pointer-events:none;
-  animation:float 9s ease-in-out infinite;
-}
+    .content { position: relative; z-index: 1; }
+    .logo {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 20px;
+      display: grid;
+      place-items: center;
+      border-radius: 22px;
+      font-size: 34px;
+      background: linear-gradient(135deg, rgba(101,216,255,.2), rgba(139,92,246,.25));
+      border: 1px solid rgba(130,160,255,.28);
+      box-shadow: 0 0 35px rgba(101,216,255,.12), inset 0 1px rgba(255,255,255,.12);
+      transform: translateZ(0);
+      animation: logo-hover 4.2s ease-in-out infinite;
+    }
 
-.orb.one{
-  background:#4f46e5;
-  top:-170px;
-  left:-100px;
-}
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 5vw, 38px);
+      letter-spacing: -1.5px;
+      line-height: 1.08;
+    }
+    .subtitle {
+      margin: 12px 0 28px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+    #status {
+      min-height: 22px;
+      margin: 0 0 13px;
+      color: #b7c2dc;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    #ip {
+      position: relative;
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 10px 0 27px;
+      padding: 18px 14px;
+      overflow: hidden;
+      border: 1px solid rgba(120,150,255,.17);
+      border-radius: 18px;
+      background: rgba(3,7,20,.55);
+      color: var(--accent);
+      font: 700 clamp(24px, 5.8vw, 37px)/1.15 "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      letter-spacing: .7px;
+      text-shadow: 0 0 22px rgba(101,216,255,.35);
+      overflow-wrap: anywhere;
+    }
+    #ip::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 -45%;
+      width: 36%;
+      pointer-events: none;
+      background: linear-gradient(90deg, transparent, rgba(101,216,255,.12), transparent);
+      transform: skewX(-18deg);
+      animation: ip-scan 3.4s ease-in-out infinite;
+    }
+    #ip[data-state="ready"]::before { opacity: .35; }
+    .loading-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      font: 500 15px/1.4 inherit;
+      letter-spacing: 0;
+      color: #dce6ff;
+      text-shadow: none;
+    }
+    .loader {
+      flex: 0 0 auto;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 2px solid rgba(101,216,255,.16);
+      border-top-color: var(--accent);
+      border-right-color: var(--accent2);
+      box-shadow: 0 0 18px rgba(101,216,255,.18);
+      animation: spin .85s linear infinite;
+    }
+    .loader::after {
+      content: "";
+      display: block;
+      width: 10px;
+      height: 10px;
+      margin: 7px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.1);
+      border-bottom-color: var(--accent);
+      animation: spin 1.25s linear infinite reverse;
+    }
 
-.orb.two{
-  background:#00d9ff;
-  right:-160px;
-  bottom:-170px;
-  animation-delay:-4s;
-}
+    .progress {
+      height: 3px;
+      margin: -13px 0 27px;
+      overflow: hidden;
+      border-radius: 99px;
+      background: rgba(255,255,255,.065);
+    }
+    .progress-bar {
+      width: 28%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--accent2), var(--accent), #76f3cf);
+      box-shadow: 0 0 14px rgba(101,216,255,.55);
+      animation: progress-glide 2s cubic-bezier(.55, 0, .35, 1) infinite;
+    }
+    .progress[hidden] { display: none; }
 
-.container{
-  position:relative;
-  width:min(92%,560px);
-  padding:44px 42px 38px;
-  text-align:center;
-  border:1px solid var(--line);
-  border-radius:28px;
-  background:linear-gradient(
-    145deg,
-    rgba(20,28,57,.82),
-    rgba(7,11,27,.76)
-  );
-  box-shadow:
-    0 30px 100px rgba(0,0,0,.45),
-    inset 0 1px rgba(255,255,255,.06);
-  backdrop-filter:blur(24px);
-  animation:cardIn .8s cubic-bezier(.2,.8,.2,1);
-}
+    .button-group {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    button {
+      min-width: 150px;
+      padding: 13px 18px;
+      border: 1px solid rgba(120,150,255,.22);
+      border-radius: 14px;
+      color: var(--text);
+      background: rgba(255,255,255,.055);
+      cursor: pointer;
+      font: 600 14px/1.2 inherit;
+      transition: transform .22s ease, box-shadow .22s ease, background-color .22s ease, border-color .22s ease;
+    }
+    button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      background: rgba(255,255,255,.1);
+      border-color: rgba(101,216,255,.35);
+      box-shadow: 0 10px 28px rgba(0,0,0,.22);
+    }
+    button:active:not(:disabled) { transform: translateY(0) scale(.985); }
+    button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    #copyBtn {
+      color: #03131b;
+      border: 0;
+      background: linear-gradient(115deg, var(--accent), #76f3cf);
+      box-shadow: 0 8px 25px rgba(101,216,255,.17);
+    }
+    #copyBtn:hover:not(:disabled) { box-shadow: 0 12px 34px rgba(101,216,255,.28); }
+    button:disabled { opacity: .4; cursor: not-allowed; }
+    #retryBtn[hidden] { display: none; }
 
-/* Smooth horizontal shine */
-.container::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  border-radius:28px;
-  pointer-events:none;
+    .error {
+      display: inline-block;
+      padding: 10px 13px;
+      border: 1px solid rgba(255,102,133,.24);
+      border-radius: 12px;
+      color: #ff9eb1;
+      background: rgba(255,70,100,.08);
+      animation: error-enter .32s ease both;
+    }
+    .success-message {
+      display: block;
+      margin-top: 14px;
+      color: var(--good);
+      font-size: 13px;
+      animation: message-enter .28s ease both;
+    }
+    .meta {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 9px;
+      margin-top: 25px;
+      color: #7783a2;
+      font-size: 10px;
+      letter-spacing: .45px;
+    }
+    .dot {
+      width: 6px;
+      height: 6px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: var(--good);
+      box-shadow: 0 0 10px var(--good);
+      animation: status-pulse 2s ease-in-out infinite;
+    }
 
-  background:linear-gradient(
-    90deg,
-    transparent 25%,
-    rgba(101,216,255,.07) 50%,
-    transparent 75%
-  );
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes drift {
+      0% { transform: translate3d(0, 0, 0) scale(1); }
+      35% { transform: translate3d(42px, 30px, 0) scale(1.08); }
+      70% { transform: translate3d(-22px, 58px, 0) scale(.94); }
+      100% { transform: translate3d(28px, -18px, 0) scale(1.04); }
+    }
+    @keyframes logo-hover {
+      0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+      25% { transform: translate3d(0, -5px, 0) rotate(-1deg); }
+      60% { transform: translate3d(0, -2px, 0) rotate(1.5deg); }
+    }
+    @keyframes card-enter {
+      from { opacity: 0; transform: translate3d(0, 24px, 0) scale(.975); }
+      to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+    }
+    @keyframes glass-sweep {
+      0%, 15% { transform: translate3d(-38%, 0, 0) rotate(8deg); }
+      65%, 100% { transform: translate3d(38%, 0, 0) rotate(8deg); }
+    }
+    @keyframes ip-scan {
+      0%, 12% { transform: translateX(0) skewX(-18deg); opacity: 0; }
+      25% { opacity: 1; }
+      75% { opacity: 1; }
+      100% { transform: translateX(430%) skewX(-18deg); opacity: 0; }
+    }
+    @keyframes progress-glide {
+      0% { transform: translateX(-130%); }
+      55% { transform: translateX(190%); }
+      100% { transform: translateX(430%); }
+    }
+    @keyframes status-pulse {
+      0%, 100% { opacity: .5; transform: scale(.82); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+    @keyframes message-enter {
+      from { opacity: 0; transform: translate3d(0, 5px, 0); }
+      to { opacity: 1; transform: translate3d(0, 0, 0); }
+    }
+    @keyframes error-enter {
+      from { opacity: 0; transform: translate3d(0, 4px, 0); }
+      to { opacity: 1; transform: translate3d(0, 0, 0); }
+    }
 
-  transform:translateX(-100%);
-  animation:shine 9s ease-in-out infinite;
-}
-
-.logo{
-  width:72px;
-  height:72px;
-  margin:0 auto 20px;
-  display:grid;
-  place-items:center;
-  border-radius:22px;
-  font-size:34px;
-  background:linear-gradient(
-    135deg,
-    rgba(101,216,255,.18),
-    rgba(139,92,246,.22)
-  );
-  border:1px solid rgba(130,160,255,.22);
-  box-shadow:0 0 35px rgba(101,216,255,.10);
-  animation:logoFloat 3s ease-in-out infinite;
-}
-
-h1{
-  margin:0;
-  font-size:clamp(28px,5vw,38px);
-  letter-spacing:-1.5px;
-  line-height:1.05;
-}
-
-.subtitle{
-  margin:11px 0 30px;
-  color:var(--muted);
-  font-size:14px;
-}
-
-#status{
-  min-height:24px;
-  margin:0 0 13px;
-  color:#aeb8d0;
-  font-size:14px;
-  transition:all .35s ease;
-}
-
-#ip{
-  position:relative;
-  min-height:74px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  margin:10px 0 28px;
-  padding:18px;
-  border-radius:18px;
-  border:1px solid rgba(120,150,255,.14);
-  background:rgba(3,7,20,.45);
-  font:
-    700 clamp(25px,6vw,38px)/1.1
-    "SFMono-Regular",
-    Consolas,
-    "Liberation Mono",
-    monospace;
-  letter-spacing:1px;
-  color:var(--accent);
-  text-shadow:0 0 22px rgba(101,216,255,.38);
-  word-break:break-all;
-  overflow:hidden;
-}
-
-#ip::before{
-  content:"";
-  position:absolute;
-  left:-30%;
-  top:0;
-  width:30%;
-  height:100%;
-  background:linear-gradient(
-    90deg,
-    transparent,
-    rgba(101,216,255,.10),
-    transparent
-  );
-  animation:scan 2.2s linear infinite;
-}
-
-.loading-content{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:13px;
-  font-size:18px;
-  letter-spacing:.5px;
-}
-
-.loader{
-  width:30px;
-  height:30px;
-  position:relative;
-  border-radius:50%;
-  border:2px solid rgba(101,216,255,.16);
-  border-top-color:var(--accent);
-  border-right-color:var(--accent2);
-  animation:spin .8s linear infinite;
-  box-shadow:0 0 18px rgba(101,216,255,.22);
-}
-
-.loader::after{
-  content:"";
-  position:absolute;
-  inset:5px;
-  border-radius:50%;
-  border:1px solid rgba(255,255,255,.10);
-  border-bottom-color:var(--accent);
-  animation:spin 1.3s linear reverse infinite;
-}
-
-.progress{
-  height:4px;
-  margin:-14px 0 28px;
-  overflow:hidden;
-  border-radius:10px;
-  background:rgba(255,255,255,.06);
-}
-
-.progress-bar{
-  width:35%;
-  height:100%;
-  border-radius:inherit;
-  background:linear-gradient(
-    90deg,
-    var(--accent2),
-    var(--accent)
-  );
-  box-shadow:0 0 14px rgba(101,216,255,.6);
-  animation:progress 1.5s ease-in-out infinite;
-}
-
-.button-group{
-  display:flex;
-  gap:12px;
-  justify-content:center;
-  flex-wrap:wrap;
-}
-
-button{
-  min-width:135px;
-  padding:13px 20px;
-  border:1px solid rgba(120,150,255,.18);
-  border-radius:14px;
-  color:var(--text);
-  background:rgba(255,255,255,.055);
-  cursor:pointer;
-  font:600 14px inherit;
-  transition:
-    transform .25s ease,
-    box-shadow .25s ease,
-    background .25s ease;
-}
-
-button:hover:not(:disabled){
-  transform:translateY(-3px);
-  background:rgba(255,255,255,.10);
-  box-shadow:0 12px 30px rgba(0,0,0,.22);
-}
-
-#copyBtn{
-  color:#03131b;
-  border:0;
-  background:linear-gradient(
-    135deg,
-    var(--accent),
-    #76f3cf
-  );
-  box-shadow:0 8px 25px rgba(101,216,255,.18);
-}
-
-#copyBtn:hover:not(:disabled){
-  box-shadow:0 14px 34px rgba(101,216,255,.28);
-}
-
-button:disabled{
-  opacity:.38;
-  cursor:not-allowed;
-}
-
-#retryBtn{
-  display:none;
-}
-
-.error{
-  display:block;
-  padding:12px 14px;
-  border:1px solid rgba(255,102,133,.2);
-  border-radius:12px;
-  color:#ff9eb1;
-  background:rgba(255,70,100,.08);
-  animation:shake .4s ease;
-}
-
-.success-message{
-  display:block;
-  margin-top:14px;
-  color:var(--good);
-  font-size:13px;
-  animation:pop .35s ease;
-}
-
-.meta{
-  display:flex;
-  justify-content:center;
-  gap:8px;
-  align-items:center;
-  margin-top:25px;
-  color:#687493;
-  font-size:11px;
-  letter-spacing:.5px;
-}
-
-.dot{
-  width:6px;
-  height:6px;
-  border-radius:50%;
-  background:var(--good);
-  box-shadow:0 0 10px var(--good);
-  animation:pulse 1.6s infinite;
-}
-
-@keyframes spin{
-  to{
-    transform:rotate(360deg);
-  }
-}
-
-@keyframes float{
-  0%,100%{
-    transform:translate(0,0);
-  }
-
-  50%{
-    transform:translate(30px,-25px);
-  }
-}
-
-@keyframes logoFloat{
-  0%,100%{
-    transform:translateY(0) rotate(0);
-  }
-
-  50%{
-    transform:translateY(-6px) rotate(2deg);
-  }
-}
-
-@keyframes cardIn{
-  from{
-    opacity:0;
-    transform:translateY(25px) scale(.97);
-  }
-
-  to{
-    opacity:1;
-    transform:none;
-  }
-}
-
-/* Left → Right → Left */
-@keyframes shine{
-  0%{
-    transform:translateX(-100%);
-  }
-
-  50%{
-    transform:translateX(100%);
-  }
-
-  100%{
-    transform:translateX(-100%);
-  }
-}
-
-@keyframes scan{
-  from{
-    left:-30%;
-  }
-
-  to{
-    left:130%;
-  }
-}
-
-@keyframes progress{
-  0%{
-    transform:translateX(-130%);
-  }
-
-  50%{
-    transform:translateX(150%);
-  }
-
-  100%{
-    transform:translateX(350%);
-  }
-}
-
-@keyframes pulse{
-  0%,100%{
-    opacity:.45;
-    transform:scale(.8);
-  }
-
-  50%{
-    opacity:1;
-    transform:scale(1.2);
-  }
-}
-
-@keyframes pop{
-  from{
-    opacity:0;
-    transform:scale(.9);
-  }
-
-  to{
-    opacity:1;
-    transform:none;
-  }
-}
-
-@keyframes shake{
-  25%{
-    transform:translateX(-5px);
-  }
-
-  75%{
-    transform:translateX(5px);
-  }
-}
-
-@media(max-width:480px){
-  .container{
-    padding:34px 22px 28px;
-    border-radius:22px;
-  }
-
-  .container::after{
-    border-radius:22px;
-  }
-
-  .logo{
-    width:62px;
-    height:62px;
-    border-radius:19px;
-  }
-
-  #ip{
-    font-size:23px;
-    min-height:68px;
-  }
-
-  button{
-    width:100%;
-  }
-}
-
-@media(prefers-reduced-motion:reduce){
-  *,
-  *::before,
-  *::after{
-    animation-duration:.001ms!important;
-    animation-iteration-count:1!important;
-    scroll-behavior:auto!important;
-  }
-}
-</style>
+    @media (max-width: 480px) {
+      .container { border-radius: 22px; }
+      .logo { width: 62px; height: 62px; border-radius: 19px; }
+      #ip { min-height: 68px; font-size: clamp(21px, 6vw, 28px); }
+      .button-group { flex-direction: column; }
+      button { width: 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
 </head>
-
 <body>
+  <div class="ambient one" aria-hidden="true"></div>
+  <div class="ambient two" aria-hidden="true"></div>
+  <div class="ambient three" aria-hidden="true"></div>
 
-    <div class="orb one"></div>
-    <div class="orb two"></div>
+  <main class="container">
+    <div class="content">
+      <div class="logo" aria-hidden="true">🌐</div>
+      <h1>Your Public IP Address</h1>
+      <p class="subtitle">See the network address that websites can see when you connect.</p>
 
-    <main class="container">
+      <p id="status" role="status" aria-live="polite">Preparing the IP address check…</p>
 
-        <div class="logo" aria-hidden="true">🌐</div>
-
-        <h1>Your Public IP Address</h1>
-
-        <p class="subtitle">
-            Securely identifying the network address that is visible to the internet
-        </p>
-
-        <p id="status" aria-live="polite" aria-atomic="true">
-            Initializing secure network connectivity check...
-        </p>
-
-        <div id="ip" aria-label="Your public IP address">
-
-            <div class="loading-content">
-
-                <span class="loader" aria-hidden="true"></span>
-
-                <span>
-                    Retrieving your IP address
-                    <span id="loadingDots">...</span>
-                </span>
-
-            </div>
-
+      <div id="ip" data-state="loading" aria-label="Your public IP address">
+        <div class="loading-content">
+          <span class="loader" aria-hidden="true"></span>
+          <span>Retrieving your IP address<span id="loadingDots">…</span></span>
         </div>
+      </div>
 
-        <div class="progress" aria-hidden="true">
-            <div class="progress-bar"></div>
-        </div>
+      <div class="progress" id="progress" aria-hidden="true">
+        <div class="progress-bar"></div>
+      </div>
 
-        <div class="button-group">
+      <div class="button-group">
+        <button id="copyBtn" type="button" disabled>📋 Copy IP Address</button>
+        <button id="retryBtn" type="button" hidden>↻ Retry Connection</button>
+      </div>
 
-            <button id="copyBtn" onclick="copyIP()" disabled>
-                📋 Copy IP Address
-            </button>
+      <div id="copyMessage" aria-live="polite"></div>
 
-            <button id="retryBtn" onclick="fetchIP()">
-                ↻ Retry Connection
-            </button>
+      <div class="meta">
+        <span class="dot" aria-hidden="true"></span>
+        <span>IPIFY API · LIVE LOOKUP</span>
+      </div>
+    </div>
+  </main>
 
-        </div>
+  <script>
+    (() => {
+      "use strict";
 
-        <div id="copyMessage"></div>
+      const API_URL = "https://api.ipify.org?format=json";
+      const TIMEOUT_MS = 8000;
 
-        <div class="meta">
+      const els = {
+        status: document.getElementById("status"),
+        ip: document.getElementById("ip"),
+        copy: document.getElementById("copyBtn"),
+        retry: document.getElementById("retryBtn"),
+        copyMessage: document.getElementById("copyMessage"),
+        progress: document.getElementById("progress")
+      };
 
-            <span class="dot"></span>
+      let currentIP = "";
+      let activeController = null;
+      let dotTimer = null;
+      let requestId = 0;
 
-            <span>
-                Powered by IPIFY API · Real-Time Live Check
-            </span>
+      function setLoadingMarkup() {
+        els.ip.dataset.state = "loading";
+        els.ip.innerHTML = `
+          <div class="loading-content">
+            <span class="loader" aria-hidden="true"></span>
+            <span>Retrieving your IP address<span id="loadingDots">…</span></span>
+          </div>`;
+      }
 
-        </div>
+      function startDots() {
+        stopDots();
+        let count = 0;
+        dotTimer = window.setInterval(() => {
+          const dots = document.getElementById("loadingDots");
+          if (dots) {
+            count = (count + 1) % 4;
+            dots.textContent = ".".repeat(count || 1);
+          }
+        }, 360);
+      }
 
-    </main>
+      function stopDots() {
+        if (dotTimer !== null) {
+          window.clearInterval(dotTimer);
+          dotTimer = null;
+        }
+      }
 
-    <script>
-        const API_URL = "https://api.ipify.org?format=json";
-        const TIMEOUT_MS = 8000;
+      function showError(message) {
+        els.status.textContent = "";
+        const error = document.createElement("span");
+        error.className = "error";
+        error.textContent = message;
+        els.status.append(error);
 
-        let currentIP = null;
-        let dotTimer = null;
+        els.ip.dataset.state = "error";
+        els.ip.textContent = "—";
+        els.copy.disabled = true;
+        els.retry.hidden = false;
+        els.progress.hidden = true;
+      }
 
-        function startLoadingAnimation() {
-            let dots = 0;
+      async function fetchIP() {
+        const thisRequest = ++requestId;
 
-            clearInterval(dotTimer);
+        // Cancel any previous attempt so rapid clicks cannot race each other.
+        if (activeController) activeController.abort();
+        activeController = new AbortController();
 
-            dotTimer = setInterval(() => {
+        currentIP = "";
+        els.copy.disabled = true;
+        els.retry.hidden = true;
+        els.copyMessage.replaceChildren();
+        els.status.textContent = "Connecting to the IP detection service…";
+        els.progress.hidden = false;
+        setLoadingMarkup();
+        startDots();
 
-                dots = (dots + 1) % 4;
+        const timeoutId = window.setTimeout(() => {
+          if (activeController && thisRequest === requestId) activeController.abort();
+        }, TIMEOUT_MS);
 
-                const el = document.getElementById("loadingDots");
+        try {
+          // A tiny pause lets the loading state render without delaying the request much.
+          await new Promise(resolve => requestAnimationFrame(resolve));
+          const response = await fetch(API_URL, {
+            method: "GET",
+            signal: activeController.signal,
+            cache: "no-store",
+            headers: { "Accept": "application/json" }
+          });
 
-                if (el) {
-                    el.textContent = ".".repeat(dots);
-                }
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const data = await response.json();
 
-            }, 350);
+          if (thisRequest !== requestId) return;
+          if (typeof data.ip !== "string" || !data.ip.trim()) {
+            throw new Error("Invalid IP response");
+          }
+
+          currentIP = data.ip.trim();
+          els.ip.dataset.state = "ready";
+          els.ip.textContent = currentIP;
+          els.status.textContent = "Lookup complete — public IP address found.";
+          els.copy.disabled = false;
+          els.progress.hidden = true;
+        } catch (error) {
+          if (thisRequest !== requestId) return;
+
+          if (error.name === "AbortError") {
+            showError("The request timed out or was cancelled. Check your connection and try again.");
+          } else if (error instanceof TypeError) {
+            showError("A network error occurred. Check your connection, DNS, or content blocker and try again.");
+          } else {
+            showError("The IP service returned an unexpected response. Please try again.");
+          }
+        } finally {
+          window.clearTimeout(timeoutId);
+          if (thisRequest === requestId) {
+            stopDots();
+            activeController = null;
+          }
+        }
+      }
+
+      async function copyIP() {
+        if (!currentIP) return;
+
+        try {
+          if (!navigator.clipboard || !window.isSecureContext) {
+            throw new Error("Clipboard API unavailable");
+          }
+          await navigator.clipboard.writeText(currentIP);
+          els.copyMessage.textContent = "";
+          const message = document.createElement("span");
+          message.className = "success-message";
+          message.textContent = "✓ IP address copied to clipboard";
+          els.copyMessage.append(message);
+        } catch {
+          // Fallback for older browsers or insecure local-file contexts.
+          const field = document.createElement("textarea");
+          field.value = currentIP;
+          field.setAttribute("readonly", "");
+          field.style.position = "fixed";
+          field.style.opacity = "0";
+          document.body.append(field);
+          field.select();
+          const copied = document.execCommand("copy");
+          field.remove();
+
+          els.copyMessage.textContent = "";
+          const message = document.createElement("span");
+          message.className = copied ? "success-message" : "error";
+          message.textContent = copied ? "✓ IP address copied to clipboard" : "Could not copy automatically. Select the IP address and copy it manually.";
+          els.copyMessage.append(message);
         }
 
-        function stopLoadingAnimation() {
-            clearInterval(dotTimer);
-            dotTimer = null;
-        }
+        window.setTimeout(() => els.copyMessage.replaceChildren(), 2400);
+      }
 
-        async function fetchIP() {
-
-            try {
-
-                currentIP = null;
-
-                startLoadingAnimation();
-
-                document.getElementById("status").textContent =
-                    "Establishing connection to the IP detection service...";
-
-                document.getElementById("ip").innerHTML =
-                    '<div class="loading-content">' +
-                    '<span class="loader" aria-hidden="true"></span>' +
-                    '<span>Retrieving your IP address' +
-                    '<span id="loadingDots">...</span>' +
-                    '</span>' +
-                    '</div>';
-
-                document.getElementById("copyBtn").disabled = true;
-
-                document.getElementById("retryBtn").style.display = "none";
-
-                document.getElementById("copyMessage").innerHTML = "";
-
-                await new Promise(resolve => setTimeout(resolve, 450));
-
-                document.getElementById("status").textContent =
-                    "Reading your public network address...";
-
-                const controller = new AbortController();
-
-                const timeoutId = setTimeout(
-                    () => controller.abort(),
-                    TIMEOUT_MS
-                );
-
-                const response = await fetch(
-                    API_URL,
-                    { signal: controller.signal }
-                );
-
-                clearTimeout(timeoutId);
-
-                if (!response.ok) {
-                    throw new Error(
-                        `HTTP error! status: ${response.status}`
-                    );
-                }
-
-                const data = await response.json();
-
-                if (!data.ip) {
-                    throw new Error("Invalid response format");
-                }
-
-                currentIP = data.ip;
-
-                stopLoadingAnimation();
-
-                document.getElementById("status").textContent =
-                    "Connection verified successfully • Your public IP address has been identified";
-
-                document.getElementById("ip").textContent =
-                    currentIP;
-
-                document.getElementById("copyBtn").disabled = false;
-
-            } catch (error) {
-
-                stopLoadingAnimation();
-
-                handleError(error);
-            }
-        }
-
-        function handleError(error) {
-
-            let errorMessage =
-                "Unable to determine your IP address.";
-
-            if (error.name === "AbortError") {
-
-                errorMessage =
-                    "The request timed out. Please check your internet connection and try again.";
-
-            } else if (error instanceof TypeError) {
-
-                errorMessage =
-                    "A network error occurred. Please verify your internet connection and try again.";
-
-            }
-
-            document.getElementById("status").innerHTML =
-                `<span class="error">${errorMessage}</span>`;
-
-            document.getElementById("ip").textContent = "";
-
-            document.getElementById("retryBtn").style.display =
-                "inline-block";
-
-            document.getElementById("copyBtn").disabled = true;
-        }
-
-        function copyIP() {
-
-            if (!currentIP) return;
-
-            navigator.clipboard
-                .writeText(currentIP)
-                .then(() => {
-
-                    const messageEl =
-                        document.getElementById("copyMessage");
-
-                    messageEl.innerHTML =
-                        '<span class="success-message">' +
-                        '✓ Successfully copied to clipboard!' +
-                        '</span>';
-
-                    setTimeout(() => {
-
-                        messageEl.innerHTML = "";
-
-                    }, 2000);
-
-                })
-                .catch(() => {
-
-                    alert("Failed to copy IP address");
-
-                });
-        }
-
-        fetchIP();
-    </script>
-
+      els.copy.addEventListener("click", copyIP);
+      els.retry.addEventListener("click", fetchIP);
+      fetchIP();
+    })();
+  </script>
 </body>
 </html>
