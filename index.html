@@ -184,7 +184,10 @@
       align-items: center;
       justify-content: center;
       gap: 12px;
-      font: 500 15px/1.4 inherit;
+      font: inherit;
+      font-size: 15px;
+      font-weight: 500;
+      line-height: 1.4;
       letter-spacing: 0;
       color: #dce6ff;
       text-shadow: none;
@@ -243,7 +246,10 @@
       color: var(--text);
       background: rgba(255,255,255,.055);
       cursor: pointer;
-      font: 600 14px/1.2 inherit;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.2;
       transition: transform .22s ease, box-shadow .22s ease, background-color .22s ease, border-color .22s ease;
     }
     button:hover:not(:disabled) {
@@ -279,6 +285,12 @@
       color: var(--good);
       font-size: 13px;
       animation: message-enter .28s ease both;
+    }
+    .privacy-note {
+      margin: 18px 0 0;
+      color: #7783a2;
+      font-size: 11px;
+      line-height: 1.5;
     }
     .meta {
       display: flex;
@@ -392,6 +404,8 @@
 
       <div id="copyMessage" aria-live="polite"></div>
 
+      <p class="privacy-note">Your IP address is sent to ipify to provide this lookup.</p>
+
       <div class="meta">
         <span class="dot" aria-hidden="true"></span>
         <span>IPIFY API · LIVE LOOKUP</span>
@@ -418,6 +432,7 @@
       let currentIP = "";
       let activeController = null;
       let dotTimer = null;
+      let copyMessageTimer = null;
       let requestId = 0;
 
       function setLoadingMarkup() {
@@ -462,12 +477,30 @@
         els.progress.hidden = true;
       }
 
+      function showCopyMessage(text, success) {
+        if (copyMessageTimer !== null) {
+          window.clearTimeout(copyMessageTimer);
+        }
+
+        els.copyMessage.replaceChildren();
+        const message = document.createElement("span");
+        message.className = success ? "success-message" : "error";
+        message.textContent = text;
+        els.copyMessage.append(message);
+
+        copyMessageTimer = window.setTimeout(() => {
+          els.copyMessage.replaceChildren();
+          copyMessageTimer = null;
+        }, 2400);
+      }
+
       async function fetchIP() {
         const thisRequest = ++requestId;
 
-        // Cancel any previous attempt so rapid clicks cannot race each other.
+        // Keep each request's controller local so retries cannot change its signal.
         if (activeController) activeController.abort();
-        activeController = new AbortController();
+        const controller = new AbortController();
+        activeController = controller;
 
         currentIP = "";
         els.copy.disabled = true;
@@ -479,7 +512,7 @@
         startDots();
 
         const timeoutId = window.setTimeout(() => {
-          if (activeController && thisRequest === requestId) activeController.abort();
+          if (thisRequest === requestId) controller.abort();
         }, TIMEOUT_MS);
 
         try {
@@ -487,7 +520,7 @@
           await new Promise(resolve => requestAnimationFrame(resolve));
           const response = await fetch(API_URL, {
             method: "GET",
-            signal: activeController.signal,
+            signal: controller.signal,
             cache: "no-store",
             headers: { "Accept": "application/json" }
           });
@@ -496,14 +529,14 @@
           const data = await response.json();
 
           if (thisRequest !== requestId) return;
-          if (typeof data.ip !== "string" || !data.ip.trim()) {
+          if (!data || typeof data.ip !== "string" || !data.ip.trim()) {
             throw new Error("Invalid IP response");
           }
 
           currentIP = data.ip.trim();
           els.ip.dataset.state = "ready";
           els.ip.textContent = currentIP;
-          els.status.textContent = "Lookup complete — public IP address found.";
+          els.status.textContent = `Lookup complete — public IP address found: ${currentIP}`;
           els.copy.disabled = false;
           els.progress.hidden = true;
         } catch (error) {
@@ -532,32 +565,36 @@
           if (!navigator.clipboard || !window.isSecureContext) {
             throw new Error("Clipboard API unavailable");
           }
+
           await navigator.clipboard.writeText(currentIP);
-          els.copyMessage.textContent = "";
-          const message = document.createElement("span");
-          message.className = "success-message";
-          message.textContent = "✓ IP address copied to clipboard";
-          els.copyMessage.append(message);
+          showCopyMessage("✓ IP address copied to clipboard", true);
         } catch {
           // Fallback for older browsers or insecure local-file contexts.
-          const field = document.createElement("textarea");
-          field.value = currentIP;
-          field.setAttribute("readonly", "");
-          field.style.position = "fixed";
-          field.style.opacity = "0";
-          document.body.append(field);
-          field.select();
-          const copied = document.execCommand("copy");
-          field.remove();
+          let copied = false;
 
-          els.copyMessage.textContent = "";
-          const message = document.createElement("span");
-          message.className = copied ? "success-message" : "error";
-          message.textContent = copied ? "✓ IP address copied to clipboard" : "Could not copy automatically. Select the IP address and copy it manually.";
-          els.copyMessage.append(message);
+          try {
+            const field = document.createElement("textarea");
+            field.value = currentIP;
+            field.setAttribute("readonly", "");
+            field.style.position = "fixed";
+            field.style.opacity = "0";
+            document.body.append(field);
+            field.select();
+            copied = document.execCommand("copy");
+            field.remove();
+          } catch {
+            copied = false;
+          }
+
+          if (copied) {
+            showCopyMessage("✓ IP address copied to clipboard", true);
+          } else {
+            showCopyMessage(
+              "Could not copy automatically. Select the IP address and copy it manually.",
+              false
+            );
+          }
         }
-
-        window.setTimeout(() => els.copyMessage.replaceChildren(), 2400);
       }
 
       els.copy.addEventListener("click", copyIP);
